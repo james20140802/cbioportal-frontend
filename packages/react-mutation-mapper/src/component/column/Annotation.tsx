@@ -79,6 +79,7 @@ export type GenericAnnotationProps = {
     enableMyCancerGenome: boolean;
     enableOncoKb: boolean;
     enableRevue: boolean;
+    enableJournalSearch: boolean;
     mergeOncoKbIcons?: boolean;
     oncoKbContentPadding?: number;
     pubMedCache?: MobxCache;
@@ -334,6 +335,7 @@ export function GenericAnnotation(props: GenericAnnotationProps): JSX.Element {
         enableMyCancerGenome,
         enableOncoKb,
         enableRevue,
+        enableJournalSearch,
         pubMedCache,
         userDisplayName,
         mergeOncoKbIcons,
@@ -389,6 +391,7 @@ export function GenericAnnotation(props: GenericAnnotationProps): JSX.Element {
                     status={annotation.hotspotStatus}
                 />
             )}
+            {enableJournalSearch}
         </span>
     );
 }
