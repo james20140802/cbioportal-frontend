@@ -946,7 +946,8 @@ export default class MutationTable<
                         enableHotspot: this.props.enableHotspot as boolean,
                         enableRevue:
                             !!this.props.enableRevue && this.shouldShowRevue,
-                        enableJournalSearch: this.props.enableJournalSearch,
+                        enableJournalSearch: this.props
+                            .enableJournalSearch as boolean,
                         userDisplayName: this.props.userDisplayName,
                         indexedVariantAnnotations: this.props
                             .indexedVariantAnnotations,
