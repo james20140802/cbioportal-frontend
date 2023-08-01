@@ -43,6 +43,7 @@ import { CanonicalMutationType } from 'cbioportal-frontend-commons';
 import { VariantAnnotation, Vues as VUE } from 'genome-nexus-ts-api-client';
 import { RevueCell, sortValue as revueSortValue } from '../revue/Revue';
 import annotationStyles from './annotation.module.scss';
+import JournalSearch from '../journalSearch/JournalSearch';
 
 export type AnnotationProps = {
     mutation?: Mutation;
@@ -159,7 +160,8 @@ export function getAnnotationData(
             civicGenes?.isComplete &&
             civicVariants?.isComplete &&
             journalSearchData?.isComplete &&
-            indexedVariantAnnotations?.isComplete;
+            indexedVariantAnnotations?.isComplete &&
+            journalSearchData.isComplete;
 
         if (memoize) {
             key = JSON.stringify(mutation) + !!usingPublicOncoKbInstance;
@@ -391,7 +393,11 @@ export function GenericAnnotation(props: GenericAnnotationProps): JSX.Element {
                     status={annotation.hotspotStatus}
                 />
             )}
-            {enableJournalSearch}
+            {enableJournalSearch && (
+                <JournalSearch
+                    journalSearchStatus={annotation.journalSearchStatus}
+                />
+            )}
         </span>
     );
 }
