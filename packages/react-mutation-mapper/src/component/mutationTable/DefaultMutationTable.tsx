@@ -9,6 +9,7 @@ import {
     Mutation,
     RemoteData,
     Pathogenicity,
+    IJournalSearchData,
 } from 'cbioportal-utils';
 import { MyVariantInfo, VariantAnnotation } from 'genome-nexus-ts-api-client';
 import { CancerGene } from 'oncokb-ts-api-client';
@@ -47,6 +48,7 @@ export type DefaultMutationTableProps = {
     oncoKbData?: RemoteData<IOncoKbData | Error | undefined>;
     myCancerGenomeData?: IMyCancerGenomeData;
     oncoKbCancerGenes?: RemoteData<CancerGene[] | Error | undefined>;
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>;
     usingPublicOncoKbInstance: boolean;
     indexedMyVariantInfoAnnotations?: RemoteData<
         { [genomicLocation: string]: MyVariantInfo } | undefined
@@ -220,8 +222,10 @@ export default class DefaultMutationTable extends React.Component<
                         enableCivic={this.props.enableCivic || false}
                         enableMyCancerGenome={true}
                         enableRevue={true}
+                        enableJournalSearch={true}
                         hotspotData={this.props.hotspotData}
                         oncoKbData={this.props.oncoKbData}
+                        journalSearchData={this.props.journalSearchData}
                         oncoKbCancerGenes={this.props.oncoKbCancerGenes}
                         usingPublicOncoKbInstance={
                             this.props.usingPublicOncoKbInstance
