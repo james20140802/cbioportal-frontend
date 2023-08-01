@@ -973,6 +973,7 @@ export default class MutationTable<
                             this.props.civicGenes,
                             this.props.civicVariants,
                             this.props.indexedVariantAnnotations,
+                            this.props.journalSearchData,
                             this.resolveTumorType
                         );
 
@@ -1015,6 +1016,7 @@ export default class MutationTable<
                     this.props.civicGenes,
                     this.props.civicVariants,
                     this.props.indexedVariantAnnotations,
+                    this.props.journalSearchData,
                     this.resolveTumorType,
                     !!this.props.enableRevue && this.shouldShowRevue
                 );
@@ -1026,6 +1028,7 @@ export default class MutationTable<
                     this.props.hotspotData,
                     this.props.myCancerGenomeData,
                     this.props.oncoKbData,
+                    this.props.journalSearchData,
                     this.props.usingPublicOncoKbInstance,
                     this.props.civicGenes,
                     this.props.civicVariants,
