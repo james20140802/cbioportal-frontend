@@ -7,6 +7,7 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearchData,
     IMyCancerGenomeData,
     IOncoKbData,
     is3dHotspot,
@@ -50,8 +51,10 @@ export type AnnotationProps = {
     enableHotspot: boolean;
     enableCivic: boolean;
     enableRevue: boolean;
+    enableJournalSearch: boolean;
     hotspotData?: RemoteData<IHotspotIndex | undefined>;
     oncoKbData?: RemoteData<IOncoKbData | Error | undefined>;
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>;
     oncoKbCancerGenes?: RemoteData<CancerGene[] | Error | undefined>;
     usingPublicOncoKbInstance: boolean;
     mergeOncoKbIcons?: boolean;
@@ -97,6 +100,7 @@ export interface IAnnotation {
     civicEntry?: ICivicEntry | null;
     civicStatus: 'pending' | 'error' | 'complete';
     hasCivicVariants: boolean;
+    journalSearchStatus: 'pending' | 'error' | 'complete';
     hugoGeneSymbol: string;
     vue?: VUE;
 }
@@ -114,6 +118,7 @@ export const DEFAULT_ANNOTATION_DATA: IAnnotation = {
     hasCivicVariants: true,
     myCancerGenomeLinks: [],
     civicStatus: 'complete',
+    journalSearchStatus: 'complete',
 };
 
 function getDefaultEntrezGeneId(mutation: Mutation): number {
@@ -137,6 +142,7 @@ export function getAnnotationData(
     indexedVariantAnnotations?: RemoteData<
         { [genomicLocation: string]: VariantAnnotation } | undefined
     >,
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>,
     resolveTumorType: (mutation: Mutation) => string = getDefaultTumorType,
     resolveEntrezGeneId: (mutation: Mutation) => number = getDefaultEntrezGeneId
 ): IAnnotation {
@@ -151,6 +157,7 @@ export function getAnnotationData(
             oncoKbData?.isComplete &&
             civicGenes?.isComplete &&
             civicVariants?.isComplete &&
+            journalSearchData?.isComplete &&
             indexedVariantAnnotations?.isComplete;
 
         if (memoize) {
@@ -234,6 +241,9 @@ export function getAnnotationData(
                           indexedVariantAnnotations.result
                       )?.annotation_summary?.vues
                     : undefined,
+            journalSearchStatus: journalSearchData
+                ? journalSearchData.status
+                : 'pending',
         };
 
         // oncoKbData may exist but it might be an instance of Error, in that case we flag the status as error
@@ -403,6 +413,7 @@ export default class Annotation extends React.Component<AnnotationProps, {}> {
             civicGenes,
             civicVariants,
             indexedVariantAnnotations,
+            journalSearchData,
         } = props;
 
         return getAnnotationData(
@@ -415,6 +426,7 @@ export default class Annotation extends React.Component<AnnotationProps, {}> {
             civicGenes,
             civicVariants,
             indexedVariantAnnotations,
+            journalSearchData,
             resolveTumorType,
             resolveEntrezGeneId
         );
