@@ -12,6 +12,8 @@ export * from './format/FormatUtils';
 
 export * from './hotspot/CancerHotspotsUtils';
 
+export * from './journalSearch/JournalSearchUtils';
+
 export * from './model/CancerHotspot';
 export * from './model/Civic';
 export * from './model/Exon';
@@ -27,6 +29,7 @@ export * from './model/SignalMutation';
 export * from './model/SignalMutationStatus';
 export * from './model/SignalGeneFrequencySummary';
 export * from './model/Uniprot';
+export * from './model/JournalSearch';
 
 export * from './mutation/MutationAnnotator';
 export * from './mutation/MutationUtils';
