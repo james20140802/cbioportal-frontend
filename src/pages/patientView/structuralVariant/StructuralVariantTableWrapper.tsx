@@ -299,6 +299,7 @@ export default class StructuralVariantTableWrapper extends React.Component<
                             enableMyCancerGenome: false,
                             enableHotspot: false,
                             enableRevue: false,
+                            enableJournalSearch: false,
                             userDisplayName: ServerConfigHelpers.getUserDisplayName(),
                             studyIdToStudy: this.props.store.studyIdToStudy
                                 .result,
