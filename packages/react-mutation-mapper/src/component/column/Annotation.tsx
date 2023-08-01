@@ -1,5 +1,6 @@
 import {
     getCivicEntry,
+    getJournalSearch,
     getMyCancerGenomeLinks,
     getRemoteDataGroupStatus,
     getVariantAnnotation,
@@ -7,6 +8,7 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearch,
     IJournalSearchData,
     IMyCancerGenomeData,
     IOncoKbData,
@@ -103,6 +105,7 @@ export interface IAnnotation {
     civicStatus: 'pending' | 'error' | 'complete';
     hasCivicVariants: boolean;
     journalSearchStatus: 'pending' | 'error' | 'complete';
+    journalSearch: IJournalSearch[];
     hugoGeneSymbol: string;
     vue?: VUE;
 }
@@ -121,6 +124,7 @@ export const DEFAULT_ANNOTATION_DATA: IAnnotation = {
     myCancerGenomeLinks: [],
     civicStatus: 'complete',
     journalSearchStatus: 'complete',
+    journalSearch: [],
 };
 
 function getDefaultEntrezGeneId(mutation: Mutation): number {
@@ -247,6 +251,12 @@ export function getAnnotationData(
             journalSearchStatus: journalSearchData
                 ? journalSearchData.status
                 : 'pending',
+            journalSearch: journalSearchData?.isComplete
+                ? getJournalSearch(
+                      mutation,
+                      journalSearchData.result as IJournalSearchData
+                  )
+                : undefined,
         };
 
         // oncoKbData may exist but it might be an instance of Error, in that case we flag the status as error
@@ -396,6 +406,7 @@ export function GenericAnnotation(props: GenericAnnotationProps): JSX.Element {
             {enableJournalSearch && (
                 <JournalSearch
                     journalSearchStatus={annotation.journalSearchStatus}
+                    journalSearch={annotation.journalSearch}
                 />
             )}
         </span>
