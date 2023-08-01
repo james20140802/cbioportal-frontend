@@ -61,6 +61,7 @@ import {
     ICivicVariantIndex,
     IHotspotIndex,
     IMyCancerGenomeData,
+    IJournalSearchData,
     RemoteData,
     IMyVariantInfoIndex,
     extractGenomicLocation,
@@ -103,9 +104,11 @@ export interface IMutationTableProps {
     enableHotspot?: boolean;
     enableCivic?: boolean;
     enableRevue?: boolean;
+    enableJournalSearch?: boolean;
     enableFunctionalImpact?: boolean;
     myCancerGenomeData?: IMyCancerGenomeData;
     hotspotData?: RemoteData<IHotspotIndex | undefined>;
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>;
     indexedVariantAnnotations?: RemoteData<
         { [genomicLocation: string]: VariantAnnotation } | undefined
     >;
@@ -300,6 +303,7 @@ export default class MutationTable<
         enableHotspot: true,
         enableCivic: false,
         enableRevue: true,
+        enableJournalSearch: true,
     };
 
     constructor(props: P) {
@@ -925,6 +929,7 @@ export default class MutationTable<
                         myCancerGenomeData: this.props.myCancerGenomeData,
                         oncoKbData: this.props.oncoKbData,
                         oncoKbCancerGenes: this.props.oncoKbCancerGenes,
+                        journalSearchData: this.props.journalSearchData,
                         usingPublicOncoKbInstance: this.props
                             .usingPublicOncoKbInstance,
                         mergeOncoKbIcons: this.props.mergeOncoKbIcons,
@@ -941,6 +946,7 @@ export default class MutationTable<
                         enableHotspot: this.props.enableHotspot as boolean,
                         enableRevue:
                             !!this.props.enableRevue && this.shouldShowRevue,
+                        enableJournalSearch: this.props.enableJournalSearch,
                         userDisplayName: this.props.userDisplayName,
                         indexedVariantAnnotations: this.props
                             .indexedVariantAnnotations,
