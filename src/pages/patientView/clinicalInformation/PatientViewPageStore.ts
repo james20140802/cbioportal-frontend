@@ -1959,7 +1959,7 @@ export class PatientViewPageStore {
                                         map[mutation.gene.hugoGeneSymbol] = [];
                                     }
 
-                                    map[mutation.gene.hugoGeneSymbol].push({
+                                    const data = {
                                         hugoGeneSymbol:
                                             mutation.gene.hugoGeneSymbol,
                                         title: $(this)
@@ -1969,7 +1969,22 @@ export class PatientViewPageStore {
                                         linkHTML: $(this)
                                             .find('id')
                                             .text(),
-                                    });
+                                    };
+
+                                    if (
+                                        map[
+                                            mutation.gene.hugoGeneSymbol
+                                        ].filter(search => {
+                                            return (
+                                                search.title == data.title &&
+                                                search.author == data.author
+                                            );
+                                        }).length == 0
+                                    ) {
+                                        map[mutation.gene.hugoGeneSymbol].push(
+                                            data
+                                        );
+                                    }
                                 });
                         });
                 }
