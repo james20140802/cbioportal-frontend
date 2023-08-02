@@ -1930,13 +1930,20 @@ export class PatientViewPageStore {
             await: () => [this.mutationData],
             invoke: async () => {
                 const map: IJournalSearchData = {};
-                let urls = this.mutationData.result.map(
-                    mutation =>
-                        'https://export.arxiv.org/api/query?search_query=ti:' +
-                        mutation.gene.hugoGeneSymbol +
-                        '+OR+abs:' +
-                        mutation.gene.hugoGeneSymbol
+                let geneName = this.mutationData.result.map(
+                    mutation => mutation.gene.hugoGeneSymbol
                 );
+                geneName = _.uniq(geneName);
+                let urls = geneName.map(name => {
+                    return (
+                        'https://export.arxiv.org/api/query?search_query=ti:' +
+                        name +
+                        '+OR+abs:' +
+                        name
+                    );
+                });
+
+                console.log(geneName);
 
                 await Promise.all(urls.map(url => fetch(url))).then(
                     async responses => {
@@ -1944,7 +1951,7 @@ export class PatientViewPageStore {
                             index,
                             response,
                         ] of responses.entries()) {
-                            const mutation = this.mutationData.result[index];
+                            const name = geneName[index];
                             await response.text().then(function(text) {
                                 let xml_doc = $.parseXML(text);
                                 $(xml_doc)
@@ -1958,20 +1965,12 @@ export class PatientViewPageStore {
                                             });
                                         let author: string = temp.join(', ');
 
-                                        if (
-                                            !(
-                                                mutation.gene.hugoGeneSymbol in
-                                                map
-                                            )
-                                        ) {
-                                            map[
-                                                mutation.gene.hugoGeneSymbol
-                                            ] = [];
+                                        if (!(name in map)) {
+                                            map[name] = [];
                                         }
 
                                         const data = {
-                                            hugoGeneSymbol:
-                                                mutation.gene.hugoGeneSymbol,
+                                            hugoGeneSymbol: name,
                                             title: $(this)
                                                 .find('title')
                                                 .text(),
@@ -1982,9 +1981,7 @@ export class PatientViewPageStore {
                                         };
 
                                         if (
-                                            map[
-                                                mutation.gene.hugoGeneSymbol
-                                            ].filter(search => {
+                                            map[name].filter(search => {
                                                 return (
                                                     search.title ==
                                                         data.title &&
@@ -1992,9 +1989,7 @@ export class PatientViewPageStore {
                                                 );
                                             }).length == 0
                                         ) {
-                                            map[
-                                                mutation.gene.hugoGeneSymbol
-                                            ].push(data);
+                                            map[name].push(data);
                                         }
                                     });
                             });
