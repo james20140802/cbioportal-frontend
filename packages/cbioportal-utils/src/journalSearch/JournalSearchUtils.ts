@@ -4,11 +4,11 @@ import { Mutation } from '../model/Mutation';
 export function getJournalSearch(
     mutation: Partial<Mutation>,
     journalSearchData: IJournalSearchData
-): IJournalSearch[] {
-    const journalSearches: IJournalSearch[] | undefined =
+): IJournalSearch[] | null {
+    const journalSearches: IJournalSearch[] | null =
         mutation.gene && mutation.gene.hugoGeneSymbol
             ? journalSearchData[mutation.gene.hugoGeneSymbol]
-            : undefined;
+            : null;
 
-    return journalSearches as IJournalSearch[];
+    return journalSearches;
 }
