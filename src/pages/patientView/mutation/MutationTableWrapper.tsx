@@ -258,6 +258,9 @@ export default class MutationTableWrapper extends React.Component<
                                 oncoKbCancerGenes={
                                     this.pageStore.oncoKbCancerGenes
                                 }
+                                journalSearchData={
+                                    this.pageStore.journalSearchData
+                                }
                                 usingPublicOncoKbInstance={
                                     this.pageStore.usingPublicOncoKbInstance
                                 }
@@ -278,6 +281,7 @@ export default class MutationTableWrapper extends React.Component<
                                 }
                                 enableCivic={getServerConfig().show_civic}
                                 enableRevue={getServerConfig().show_revue}
+                                enableJournalSearch={true}
                                 columnVisibility={this.props.columnVisibility}
                                 showGeneFilterMenu={
                                     this.pageStore
