@@ -105,7 +105,7 @@ export interface IAnnotation {
     civicStatus: 'pending' | 'error' | 'complete';
     hasCivicVariants: boolean;
     journalSearchStatus: 'pending' | 'error' | 'complete';
-    journalSearch: IJournalSearch[];
+    journalSearch: IJournalSearch[] | null | undefined;
     hugoGeneSymbol: string;
     vue?: VUE;
 }
