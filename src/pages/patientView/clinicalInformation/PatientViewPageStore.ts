@@ -1,4 +1,4 @@
-import _, { result } from 'lodash';
+import _, { reject, result } from 'lodash';
 import {
     CBioPortalAPIInternal,
     ClinicalData,
@@ -149,6 +149,8 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearch,
+    IJournalSearchData,
     IMyCancerGenomeData,
     IMyVariantInfoIndex,
     indexHotspotsData,
@@ -195,6 +197,8 @@ import { buildNamespaceColumnConfig } from 'shared/components/namespaceColumns/n
 import { SiteError } from 'shared/model/appMisc';
 import { AnnotatedExtendedAlteration } from 'shared/model/AnnotatedExtendedAlteration';
 import { CustomDriverNumericGeneMolecularData } from 'shared/model/CustomDriverNumericGeneMolecularData';
+import { resolve } from 'url';
+import { error } from 'jquery';
 
 type PageMode = 'patient' | 'sample';
 type ResourceId = string;
@@ -1919,6 +1923,62 @@ export class PatientViewPageStore {
                 ),
         },
         []
+    );
+
+    readonly journalSearchData = remoteData<IJournalSearchData | undefined>(
+        {
+            await: () => [this.mutationData],
+            invoke: async () => {
+                const map: IJournalSearchData = {};
+
+                for await (let mutation of this.mutationData.result) {
+                    let url: string =
+                        'https://export.arxiv.org/api/query?search_query=ti:' +
+                        mutation.gene.hugoGeneSymbol +
+                        '+OR+abs' +
+                        mutation.gene.hugoGeneSymbol;
+
+                    await fetch(url)
+                        .then(response => response.text())
+                        .then(xml => $.parseXML(xml))
+                        .then(xml_doc => {
+                            $(xml_doc)
+                                .find('entry')
+                                .each(function() {
+                                    let temp: string[] = [];
+                                    $(this)
+                                        .find('author')
+                                        .each(function() {
+                                            temp.push($(this).text());
+                                        });
+                                    let author: string = temp.join(', ');
+
+                                    if (
+                                        !(mutation.gene.hugoGeneSymbol in map)
+                                    ) {
+                                        map[mutation.gene.hugoGeneSymbol] = [];
+                                    }
+
+                                    map[mutation.gene.hugoGeneSymbol].push({
+                                        hugoGeneSymbol:
+                                            mutation.gene.hugoGeneSymbol,
+                                        title: $(this)
+                                            .find('title')
+                                            .text(),
+                                        author: author,
+                                        linkHTML: $(this)
+                                            .find('id')
+                                            .text(),
+                                    });
+                                });
+                        });
+                }
+
+                return map;
+            },
+            onError: (err: Error) => {},
+        },
+        undefined
     );
 
     @computed get sampleIds(): string[] {
