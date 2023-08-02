@@ -1935,7 +1935,7 @@ export class PatientViewPageStore {
                     let url: string =
                         'https://export.arxiv.org/api/query?search_query=ti:' +
                         mutation.gene.hugoGeneSymbol +
-                        '+OR+abs' +
+                        '+OR+abs:' +
                         mutation.gene.hugoGeneSymbol;
 
                     await fetch(url)
