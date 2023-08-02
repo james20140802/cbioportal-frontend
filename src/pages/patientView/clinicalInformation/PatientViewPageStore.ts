@@ -1930,64 +1930,135 @@ export class PatientViewPageStore {
             await: () => [this.mutationData],
             invoke: async () => {
                 const map: IJournalSearchData = {};
-
-                for await (let mutation of this.mutationData.result) {
-                    let url: string =
+                let urls = this.mutationData.result.map(
+                    mutation =>
                         'https://export.arxiv.org/api/query?search_query=ti:' +
                         mutation.gene.hugoGeneSymbol +
                         '+OR+abs:' +
-                        mutation.gene.hugoGeneSymbol;
+                        mutation.gene.hugoGeneSymbol
+                );
 
-                    await fetch(url)
-                        .then(response => response.text())
-                        .then(xml => $.parseXML(xml))
-                        .then(xml_doc => {
-                            $(xml_doc)
-                                .find('entry')
-                                .each(function() {
-                                    let temp: string[] = [];
-                                    $(this)
-                                        .find('author')
-                                        .each(function() {
-                                            temp.push($(this).text());
-                                        });
-                                    let author: string = temp.join(', ');
+                await Promise.all(urls.map(url => fetch(url))).then(
+                    async responses => {
+                        for await (let [
+                            index,
+                            response,
+                        ] of responses.entries()) {
+                            const mutation = this.mutationData.result[index];
+                            await response.text().then(function(text) {
+                                let xml_doc = $.parseXML(text);
+                                $(xml_doc)
+                                    .find('entry')
+                                    .each(function() {
+                                        let temp: string[] = [];
+                                        $(this)
+                                            .find('author')
+                                            .each(function() {
+                                                temp.push($(this).text());
+                                            });
+                                        let author: string = temp.join(', ');
 
-                                    if (
-                                        !(mutation.gene.hugoGeneSymbol in map)
-                                    ) {
-                                        map[mutation.gene.hugoGeneSymbol] = [];
-                                    }
+                                        if (
+                                            !(
+                                                mutation.gene.hugoGeneSymbol in
+                                                map
+                                            )
+                                        ) {
+                                            map[
+                                                mutation.gene.hugoGeneSymbol
+                                            ] = [];
+                                        }
 
-                                    const data = {
-                                        hugoGeneSymbol:
-                                            mutation.gene.hugoGeneSymbol,
-                                        title: $(this)
-                                            .find('title')
-                                            .text(),
-                                        author: author,
-                                        linkHTML: $(this)
-                                            .find('id')
-                                            .text(),
-                                    };
+                                        const data = {
+                                            hugoGeneSymbol:
+                                                mutation.gene.hugoGeneSymbol,
+                                            title: $(this)
+                                                .find('title')
+                                                .text(),
+                                            author: author,
+                                            linkHTML: $(this)
+                                                .find('id')
+                                                .text(),
+                                        };
 
-                                    if (
-                                        map[
-                                            mutation.gene.hugoGeneSymbol
-                                        ].filter(search => {
-                                            return (
-                                                search.title == data.title &&
-                                                search.author == data.author
-                                            );
-                                        }).length == 0
-                                    ) {
-                                        map[mutation.gene.hugoGeneSymbol].push(
-                                            data
-                                        );
-                                    }
-                                });
-                        });
-                }
+                                        if (
+                                            map[
+                                                mutation.gene.hugoGeneSymbol
+                                            ].filter(search => {
+                                                return (
+                                                    search.title ==
+                                                        data.title &&
+                                                    search.author == data.author
+                                                );
+                                            }).length == 0
+                                        ) {
+                                            map[
+                                                mutation.gene.hugoGeneSymbol
+                                            ].push(data);
+                                        }
+                                    });
+                            });
+                        }
+                    }
+                );
+
+                // for await (let mutation of this.mutationData.result) {
+                //     let url: string =
+                //         'https://export.arxiv.org/api/query?search_query=ti:' +
+                //         mutation.gene.hugoGeneSymbol +
+                //         '+OR+abs:' +
+                //         mutation.gene.hugoGeneSymbol;
+
+                //     await fetch(url)
+                //         .then(response => response.text())
+                //         .then(xml => $.parseXML(xml))
+                //         .then(xml_doc => {
+                //             $(xml_doc)
+                //                 .find('entry')
+                //                 .each(function() {
+                //                     let temp: string[] = [];
+                //                     $(this)
+                //                         .find('author')
+                //                         .each(function() {
+                //                             temp.push($(this).text());
+                //                         });
+                //                     let author: string = temp.join(', ');
+
+                //                     if (
+                //                         !(mutation.gene.hugoGeneSymbol in map)
+                //                     ) {
+                //                         map[mutation.gene.hugoGeneSymbol] = [];
+                //                     }
+
+                //                     const data = {
+                //                         hugoGeneSymbol:
+                //                             mutation.gene.hugoGeneSymbol,
+                //                         title: $(this)
+                //                             .find('title')
+                //                             .text(),
+                //                         author: author,
+                //                         linkHTML: $(this)
+                //                             .find('id')
+                //                             .text(),
+                //                     };
+
+                //                     if (
+                //                         map[
+                //                             mutation.gene.hugoGeneSymbol
+                //                         ].filter(search => {
+                //                             return (
+                //                                 search.title == data.title &&
+                //                                 search.author == data.author
+                //                             );
+                //                         }).length == 0
+                //                     ) {
+                //                         map[mutation.gene.hugoGeneSymbol].push(
+                //                             data
+                //                         );
+                //                     }
+                //                 });
+                //         });
+                // }
 
                 return map;
             },
