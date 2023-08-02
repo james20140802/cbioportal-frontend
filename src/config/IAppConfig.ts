@@ -68,6 +68,7 @@ export interface IServerConfig {
     show_oncokb: boolean;
     show_civic: boolean;
     show_revue: boolean;
+    show_journal_search: boolean;
     show_genomenexus: boolean;
     show_genomenexus_annotation_sources: string;
     show_pathway_mapper: boolean;

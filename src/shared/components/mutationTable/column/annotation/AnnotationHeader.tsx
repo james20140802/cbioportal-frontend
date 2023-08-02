@@ -56,6 +56,7 @@ export enum AnnotationSources {
     MY_CANCER_GENOME = 'myCancerGenome',
     CANCER_HOTSPOTS = 'cancerHotspots',
     REVUE = 'reVue',
+    JOURNAL_SEARCH = 'journalSearch',
 }
 
 export const sourceTooltipInfo = {
@@ -111,6 +112,14 @@ export const sourceTooltipInfo = {
             sourceName: 'reVUE',
             sourceDescription:
                 'a repository for variants with unexpected effects (VUE) in cancer',
+        },
+    ],
+    [AnnotationSources.JOURNAL_SEARCH]: [
+        {
+            sourceUrl: 'https://arxiv.org',
+            sourceName: 'arxiv',
+            sourceDescription:
+                'an API for searching related journals. Thank you to arXiv for use of its open access interoperability.',
         },
     ],
 };
@@ -182,6 +191,22 @@ export const cancerHotspotsData: LegendDescription[] = [
     {
         legend: <span />,
         description: <span>Not a known hotspot</span>,
+    },
+];
+
+export const journalSearchData: LegendDescription[] = [
+    {
+        legend: (
+            <img
+                src={require('../../../../../../src/rootImages/journal-search.svg')}
+                style={{ height: 14, width: 14, marginLeft: 8 }}
+            />
+        ),
+        description: <span>Related journal exists.</span>,
+    },
+    {
+        legend: <span />,
+        description: <span>No related journal exists.</span>,
     },
 ];
 
@@ -495,6 +520,26 @@ const AnnotationHeader: React.FunctionComponent<{
                 >
                     <img
                         src={require('../../../../../../src/rootImages/cancer-hotspots.svg')}
+                        style={{ height: 14, width: 14, marginLeft: 7 }}
+                    />
+                </DefaultTooltip>
+            )}
+            {getServerConfig().show_journal_search && (
+                <DefaultTooltip
+                    placement="top"
+                    overlay={
+                        <AnnotationHeaderTooltipCard
+                            infoProps={
+                                sourceTooltipInfo[
+                                    AnnotationSources.JOURNAL_SEARCH
+                                ]
+                            }
+                            legendDescriptions={journalSearchData}
+                        />
+                    }
+                >
+                    <img
+                        src={require('../../../../../../src/rootImages/journal-search.svg')}
                         style={{ height: 14, width: 14, marginLeft: 7 }}
                     />
                 </DefaultTooltip>

@@ -44,6 +44,7 @@ export const ServerConfigDefaults: Partial<IServerConfig> = {
     show_oncokb: true,
     show_civic: false,
     show_revue: true,
+    show_journal_search: true,
     show_pathway_mapper: true,
     show_mutation_mapper_tool_grch38: true,
     show_transcript_dropdown: false,
