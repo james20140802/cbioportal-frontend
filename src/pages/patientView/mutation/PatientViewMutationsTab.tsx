@@ -319,6 +319,9 @@ export default class PatientViewMutationsTab extends React.Component<
                     oncoKbCancerGenes={
                         this.props.patientViewPageStore.oncoKbCancerGenes
                     }
+                    journalSearchData={
+                        this.props.patientViewPageStore.journalSearchData
+                    }
                     usingPublicOncoKbInstance={
                         this.props.patientViewPageStore
                             .usingPublicOncoKbInstance
@@ -336,6 +339,7 @@ export default class PatientViewMutationsTab extends React.Component<
                     enableMyCancerGenome={getServerConfig().mycancergenome_show}
                     enableCivic={getServerConfig().show_civic}
                     enableRevue={getServerConfig().show_revue}
+                    enableJournalSearch={getServerConfig().show_journal_search}
                     columnVisibility={this.props.mutationTableColumnVisibility}
                     columnVisibilityProps={{
                         onColumnToggled: this.props
