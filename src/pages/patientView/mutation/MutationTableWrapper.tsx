@@ -281,7 +281,9 @@ export default class MutationTableWrapper extends React.Component<
                                 }
                                 enableCivic={getServerConfig().show_civic}
                                 enableRevue={getServerConfig().show_revue}
-                                enableJournalSearch={true}
+                                enableJournalSearch={
+                                    getServerConfig().show_journal_search
+                                }
                                 columnVisibility={this.props.columnVisibility}
                                 showGeneFilterMenu={
                                     this.pageStore
