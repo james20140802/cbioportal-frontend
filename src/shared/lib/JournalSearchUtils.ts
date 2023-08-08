@@ -1,9 +1,13 @@
 import _ from 'lodash';
 import { Mutation } from 'cbioportal-ts-api-client';
-import { IJournalSearchData } from 'cbioportal-utils';
+import { IJournalSearch, IJournalSearchData } from 'cbioportal-utils';
 
 interface IdMap<T> {
     [key: string]: Array<T>;
+}
+
+interface IdDataMap {
+    [key: string]: Object;
 }
 
 const throttledRequest = (baseUrl: string) => {
@@ -72,12 +76,13 @@ export async function fetchJournalInfo(
         idMap[geneName].length > 0 ? idMap[geneName].join(',') : ''
     );
 
+    const idDataMap: IdDataMap = {};
     const map: IJournalSearchData = {};
 
-    const request = throttledRequest(baseUrl);
-    await Promise.all(request(ids)).then(data => {
-        data.forEach((d, index) => {
-            let xml_doc = $.parseXML(d as string);
+    await fetch(baseUrl + ids.filter(id => id !== '').join(',')).then(
+        async response => {
+            let text = await response.text();
+            let xml_doc = $.parseXML(text as string);
 
             $(xml_doc)
                 .find('PubmedArticle')
@@ -106,26 +111,37 @@ export async function fetchJournalInfo(
                         author = temp[0] + ' et al.';
                     }
 
-                    const geneName = geneNames[index];
+                    const id = $(this)
+                        .find('PMID')
+                        .first()
+                        .text();
 
-                    if (!(geneName in map)) {
-                        map[geneName] = [];
-                    }
-                    map[geneName].push({
-                        hugoGeneSymbol: geneName,
+                    idDataMap[id] = {
                         title: $(this)
                             .find('ArticleTitle')
                             .text(),
                         author: author,
-                        linkHTML:
-                            'https://pubmed.ncbi.nlm.nih.gov/' +
-                            $(this)
-                                .find('PMID')
-                                .first()
-                                .text(),
-                    });
+                    };
                 });
-        });
+        }
+    );
+
+    geneNames.forEach(geneName => {
+        if (geneName in idMap) {
+            let idList = idMap[geneName];
+            idList.forEach(id => {
+                if (id in idDataMap) {
+                    if (!(geneName in map)) {
+                        map[geneName] = [];
+                    }
+                    map[geneName].push({
+                        ...idDataMap[id],
+                        hugoGeneSymbol: geneName,
+                        linkHTML: 'https://pubmed.ncbi.nlm.nih.gov/' + id,
+                    } as IJournalSearch);
+                }
+            });
+        }
     });
 
     return map;
