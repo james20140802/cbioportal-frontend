@@ -23,9 +23,7 @@ export function journalSearchLinks(journalSearches: IJournalSearch[]) {
         links.push(
             <li key={index}>
                 <a href={search.linkHTML} target="_blank">
-                    {search.author}
-                    <br />
-                    <i>{search.title}</i>
+                    {search.author} <i>{search.title}</i>
                 </a>
             </li>
         );
