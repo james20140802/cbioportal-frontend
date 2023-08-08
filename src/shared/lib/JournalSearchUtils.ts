@@ -121,6 +121,7 @@ export async function fetchJournalInfo(
                             'https://pubmed.ncbi.nlm.nih.gov/' +
                             $(this)
                                 .find('PMID')
+                                .first()
                                 .text(),
                     });
                 });
