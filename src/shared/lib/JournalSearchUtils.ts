@@ -137,7 +137,9 @@ export async function fetchJournalInfo(
                     map[geneName].push({
                         ...idDataMap[id],
                         hugoGeneSymbol: geneName,
-                        linkHTML: 'https://pubmed.ncbi.nlm.nih.gov/' + id,
+                        linkHTML:
+                            'https://www.ncbi.nlm.nih.gov/research/pubtator/?view=publication&pmid=' +
+                            id,
                     } as IJournalSearch);
                 }
             });
