@@ -22,6 +22,9 @@ const throttledRequest = (baseUrl: string) => {
 
     return (names: string[]) => {
         return names.map((name: string) => {
+            if (name === '') {
+                return '';
+            }
             num = Math.floor(requestCount / 10);
             requestCount++;
             return new Promise((resolve, reject) => {
