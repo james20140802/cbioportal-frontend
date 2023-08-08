@@ -199,6 +199,10 @@ import { AnnotatedExtendedAlteration } from 'shared/model/AnnotatedExtendedAlter
 import { CustomDriverNumericGeneMolecularData } from 'shared/model/CustomDriverNumericGeneMolecularData';
 import { resolve } from 'url';
 import { error } from 'jquery';
+import {
+    fetchJournalSearchData,
+    fetchPubmedId,
+} from 'shared/lib/JournalSearchUtils';
 
 type PageMode = 'patient' | 'sample';
 type ResourceId = string;
@@ -1929,135 +1933,84 @@ export class PatientViewPageStore {
         {
             await: () => [this.mutationData],
             invoke: async () => {
-                const map: IJournalSearchData = {};
-                let geneName = this.mutationData.result.map(
-                    mutation => mutation.gene.hugoGeneSymbol
-                );
-                geneName = _.uniq(geneName);
-                let urls = geneName.map(name => {
-                    return (
-                        'https://export.arxiv.org/api/query?search_query=ti:' +
-                        name +
-                        '+OR+abs:' +
-                        name
-                    );
-                });
-
-                console.log(geneName);
-
-                await Promise.all(urls.map(url => fetch(url))).then(
-                    async responses => {
-                        for await (let [
-                            index,
-                            response,
-                        ] of responses.entries()) {
-                            const name = geneName[index];
-                            await response.text().then(function(text) {
-                                let xml_doc = $.parseXML(text);
-                                $(xml_doc)
-                                    .find('entry')
-                                    .each(function() {
-                                        let temp: string[] = [];
-                                        $(this)
-                                            .find('author')
-                                            .each(function() {
-                                                temp.push($(this).text());
-                                            });
-                                        let author: string = temp.join(', ');
-
-                                        if (!(name in map)) {
-                                            map[name] = [];
-                                        }
-
-                                        const data = {
-                                            hugoGeneSymbol: name,
-                                            title: $(this)
-                                                .find('title')
-                                                .text(),
-                                            author: author,
-                                            linkHTML: $(this)
-                                                .find('id')
-                                                .text(),
-                                        };
-
-                                        if (
-                                            map[name].filter(search => {
-                                                return (
-                                                    search.title ==
-                                                        data.title &&
-                                                    search.author == data.author
-                                                );
-                                            }).length == 0
-                                        ) {
-                                            map[name].push(data);
-                                        }
-                                    });
-                            });
-                        }
-                    }
+                const map = await fetchJournalSearchData(
+                    this.mutationData.result
                 );
 
-                // for await (let mutation of this.mutationData.result) {
-                //     let url: string =
+                // const map: IJournalSearchData = {};
+
+                // let geneName = this.mutationData.result.map(
+                //     mutation => mutation.gene.hugoGeneSymbol
+                // );
+
+                // geneName = _.uniq(geneName);
+
+                // let urls = geneName.map(name => {
+                //     return (
                 //         'https://export.arxiv.org/api/query?search_query=ti:' +
-                //         mutation.gene.hugoGeneSymbol +
+                //         name +
                 //         '+OR+abs:' +
-                //         mutation.gene.hugoGeneSymbol;
+                //         name
+                //     );
+                // });
+                // await Promise.all(urls.map(url => fetch(url))).then(
+                //     async responses => {
+                //         for await (let [
+                //             index,
+                //             response,
+                //         ] of responses.entries()) {
+                //             const name = geneName[index];
+                //             await response.text().then(function(text) {
+                //                 let xml_doc = $.parseXML(text);
+                //                 $(xml_doc)
+                //                     .find('entry')
+                //                     .each(function() {
+                //                         let temp: string[] = [];
+                //                         $(this)
+                //                             .find('author')
+                //                             .each(function() {
+                //                                 temp.push($(this).text());
+                //                             });
+                //                         let author: string = temp.join(', ');
 
-                //     await fetch(url)
-                //         .then(response => response.text())
-                //         .then(xml => $.parseXML(xml))
-                //         .then(xml_doc => {
-                //             $(xml_doc)
-                //                 .find('entry')
-                //                 .each(function() {
-                //                     let temp: string[] = [];
-                //                     $(this)
-                //                         .find('author')
-                //                         .each(function() {
-                //                             temp.push($(this).text());
-                //                         });
-                //                     let author: string = temp.join(', ');
+                //                         if (!(name in map)) {
+                //                             map[name] = [];
+                //                         }
 
-                //                     if (
-                //                         !(mutation.gene.hugoGeneSymbol in map)
-                //                     ) {
-                //                         map[mutation.gene.hugoGeneSymbol] = [];
-                //                     }
+                //                         const data = {
+                //                             hugoGeneSymbol: name,
+                //                             title: $(this)
+                //                                 .find('title')
+                //                                 .text(),
+                //                             author: author,
+                //                             linkHTML: $(this)
+                //                                 .find('id')
+                //                                 .text(),
+                //                         };
 
-                //                     const data = {
-                //                         hugoGeneSymbol:
-                //                             mutation.gene.hugoGeneSymbol,
-                //                         title: $(this)
-                //                             .find('title')
-                //                             .text(),
-                //                         author: author,
-                //                         linkHTML: $(this)
-                //                             .find('id')
-                //                             .text(),
-                //                     };
+                //                         if (
+                //                             map[name].filter(search => {
+                //                                 return (
+                //                                     search.title ==
+                //                                         data.title &&
+                //                                     search.author == data.author
+                //                                 );
+                //                             }).length == 0
+                //                         ) {
+                //                             map[name].push(data);
+                //                         }
+                //                     });
+                //             });
+                //         }
+                //     }
+                // );
 
-                //                     if (
-                //                         map[
-                //                             mutation.gene.hugoGeneSymbol
-                //                         ].filter(search => {
-                //                             return (
-                //                                 search.title == data.title &&
-                //                                 search.author == data.author
-                //                             );
-                //                         }).length == 0
-                //                     ) {
-                //                         map[mutation.gene.hugoGeneSymbol].push(
-                //                             data
-                //                         );
-                //                     }
-                //                 });
-                //         });
-                // }
-
+                // console.log(map);
                 return map;
             },
-            onError: (err: Error) => {},
+            onError: (err: Error) => {
+                console.log(err);
+            },
         },
         undefined
     );
