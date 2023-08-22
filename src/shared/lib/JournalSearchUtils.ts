@@ -12,7 +12,6 @@ interface IdDataMap {
 
 const throttledRequest = (baseUrl: string) => {
     let requestCount = 0;
-    let num = 0;
 
     const fetchRequest = (name: string) =>
         fetch(baseUrl + name, {
@@ -32,7 +31,7 @@ const throttledRequest = (baseUrl: string) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve(fetchRequest(name));
-                }, 150 * requestCount++);
+                }, 200 * requestCount++);
             });
         });
     };
