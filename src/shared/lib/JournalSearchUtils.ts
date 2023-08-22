@@ -31,7 +31,7 @@ const throttledRequest = (baseUrl: string) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve(fetchRequest(name));
-                }, 200 * requestCount++);
+                }, 500 * requestCount++);
             });
         });
     };
@@ -41,7 +41,7 @@ export async function fetchPubmedId(
     geneNames: string[]
 ): Promise<IdMap<string>> {
     const baseUrl =
-        'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?api_key=37f99bee52c25de5aa95f339d964ad7c8109&db=pubmed&retmax=10&term="free full text"[sb]+AND+science[journal]+AND+';
+        'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=10&term="free full text"[sb]+AND+science[journal]+AND+';
 
     let idMap: IdMap<string> = {};
 
@@ -67,7 +67,7 @@ export async function fetchJournalInfo(
     geneNames: string[]
 ) {
     const baseUrl =
-        'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?api_key=37f99bee52c25de5aa95f339d964ad7c8109&db=pubmed&retmode=xml&id=';
+        'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?&db=pubmed&retmode=xml&id=';
 
     const ids = geneNames.map(geneName =>
         idMap[geneName].length > 0 ? idMap[geneName].join(',') : ''
