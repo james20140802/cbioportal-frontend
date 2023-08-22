@@ -29,12 +29,10 @@ const throttledRequest = (baseUrl: string) => {
             if (name === '') {
                 return '';
             }
-            num = Math.floor(requestCount / 10);
-            requestCount++;
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve(fetchRequest(name));
-                }, 1750 * num);
+                }, 150 * requestCount++);
             });
         });
     };
