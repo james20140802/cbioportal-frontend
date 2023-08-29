@@ -90,11 +90,11 @@ export async function fetchJournalInfo(
                         .each(function() {
                             temp.push(
                                 $(this)
-                                    .find('Initials')
+                                    .find('LastName')
                                     .text() +
                                     '. ' +
                                     $(this)
-                                        .find('LastName')
+                                        .find('Initials')
                                         .text()
                             );
                         });
