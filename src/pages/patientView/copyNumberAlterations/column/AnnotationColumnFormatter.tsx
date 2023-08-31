@@ -151,6 +151,8 @@ export default class AnnotationColumnFormatter {
                         : true,
                 myCancerGenomeLinks: [],
                 hotspotStatus: 'complete',
+                journalSearch: undefined,
+                journalSearchStatus: 'complete',
                 isHotspot: false,
                 is3dHotspot: false,
             };

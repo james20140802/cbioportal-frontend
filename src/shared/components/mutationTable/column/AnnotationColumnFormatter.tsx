@@ -13,6 +13,7 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearchData,
     IMyCancerGenomeData,
     IOncoKbData,
     RemoteData,
@@ -37,6 +38,7 @@ export default class AnnotationColumnFormatter {
         hotspotData?: RemoteData<IHotspotIndex | undefined>,
         myCancerGenomeData?: IMyCancerGenomeData,
         oncoKbData?: RemoteData<IOncoKbData | Error | undefined>,
+        journalSearchData?: RemoteData<IJournalSearchData | undefined>,
         usingPublicOncoKbInstance?: boolean,
         civicGenes?: RemoteData<ICivicGeneIndex | undefined>,
         civicVariants?: RemoteData<ICivicVariantIndex | undefined>,
@@ -55,6 +57,7 @@ export default class AnnotationColumnFormatter {
             civicGenes,
             civicVariants,
             indexedVariantAnnotations,
+            journalSearchData,
             resolveTumorType
         );
         return annotationSortValue(annotationData);
@@ -72,6 +75,7 @@ export default class AnnotationColumnFormatter {
         indexedVariantAnnotations?: RemoteData<
             { [genomicLocation: string]: VariantAnnotation } | undefined
         >,
+        journalSearchData?: RemoteData<IJournalSearchData | undefined>,
         resolveTumorType?: (mutation: Mutation) => string,
         shouldShowRevue?: boolean
     ) {
@@ -85,6 +89,7 @@ export default class AnnotationColumnFormatter {
             civicGenes,
             civicVariants,
             indexedVariantAnnotations,
+            journalSearchData,
             resolveTumorType
         );
 

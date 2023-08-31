@@ -1,4 +1,4 @@
-import _, { result } from 'lodash';
+import _, { reject, result } from 'lodash';
 import {
     CBioPortalAPIInternal,
     ClinicalData,
@@ -153,6 +153,8 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearch,
+    IJournalSearchData,
     IMyCancerGenomeData,
     IMyVariantInfoIndex,
     indexHotspotsData,
@@ -204,6 +206,12 @@ import { buildNamespaceColumnConfig } from 'shared/components/namespaceColumns/n
 import { SiteError } from 'shared/model/appMisc';
 import { AnnotatedExtendedAlteration } from 'shared/model/AnnotatedExtendedAlteration';
 import { CustomDriverNumericGeneMolecularData } from 'shared/model/CustomDriverNumericGeneMolecularData';
+import { resolve } from 'url';
+import { error } from 'jquery';
+import {
+    fetchJournalSearchData,
+    fetchPubmedId,
+} from 'shared/lib/JournalSearchUtils';
 
 type PageMode = 'patient' | 'sample';
 type ResourceId = string;
@@ -2019,6 +2027,92 @@ export class PatientViewPageStore {
                 ),
         },
         []
+    );
+
+    readonly journalSearchData = remoteData<IJournalSearchData | undefined>(
+        {
+            await: () => [this.mutationData],
+            invoke: async () => {
+                const map = await fetchJournalSearchData(
+                    this.mutationData.result
+                );
+
+                // const map: IJournalSearchData = {};
+
+                // let geneName = this.mutationData.result.map(
+                //     mutation => mutation.gene.hugoGeneSymbol
+                // );
+
+                // geneName = _.uniq(geneName);
+
+                // let urls = geneName.map(name => {
+                //     return (
+                //         'https://export.arxiv.org/api/query?search_query=ti:' +
+                //         name +
+                //         '+OR+abs:' +
+                //         name
+                //     );
+                // });
+                // await Promise.all(urls.map(url => fetch(url))).then(
+                //     async responses => {
+                //         for await (let [
+                //             index,
+                //             response,
+                //         ] of responses.entries()) {
+                //             const name = geneName[index];
+                //             await response.text().then(function(text) {
+                //                 let xml_doc = $.parseXML(text);
+                //                 $(xml_doc)
+                //                     .find('entry')
+                //                     .each(function() {
+                //                         let temp: string[] = [];
+                //                         $(this)
+                //                             .find('author')
+                //                             .each(function() {
+                //                                 temp.push($(this).text());
+                //                             });
+                //                         let author: string = temp.join(', ');
+
+                //                         if (!(name in map)) {
+                //                             map[name] = [];
+                //                         }
+
+                //                         const data = {
+                //                             hugoGeneSymbol: name,
+                //                             title: $(this)
+                //                                 .find('title')
+                //                                 .text(),
+                //                             author: author,
+                //                             linkHTML: $(this)
+                //                                 .find('id')
+                //                                 .text(),
+                //                         };
+
+                //                         if (
+                //                             map[name].filter(search => {
+                //                                 return (
+                //                                     search.title ==
+                //                                         data.title &&
+                //                                     search.author == data.author
+                //                                 );
+                //                             }).length == 0
+                //                         ) {
+                //                             map[name].push(data);
+                //                         }
+                //                     });
+                //             });
+                //         }
+                //     }
+                // );
+
+                // console.log(map);
+                return map;
+            },
+            onError: (err: Error) => {
+                console.log(err);
+            },
+        },
+        undefined
     );
 
     @computed get sampleIds(): string[] {

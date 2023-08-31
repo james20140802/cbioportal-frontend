@@ -3,6 +3,7 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearchData,
     IMyCancerGenomeData,
     IOncoKbData,
     Mutation,
@@ -74,6 +75,7 @@ export interface MutationMapperStore<T extends Mutation> {
     indexedMyVariantInfoAnnotations?: RemoteData<
         { [genomicLocation: string]: MyVariantInfo } | undefined
     >;
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>;
     transcriptsWithAnnotations: RemoteData<string[] | undefined>;
     transcriptsWithProteinLength: RemoteData<string[] | undefined>;
     mutationsByTranscriptId: { [transcriptId: string]: T[] };

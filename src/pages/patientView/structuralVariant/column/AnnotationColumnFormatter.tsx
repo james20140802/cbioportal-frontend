@@ -136,6 +136,8 @@ export default class AnnotationColumnFormatter {
                 hasCivicVariants: false,
                 myCancerGenomeLinks: [],
                 hotspotStatus: 'complete',
+                journalSearch: undefined,
+                journalSearchStatus: 'complete',
                 isHotspot: false,
                 is3dHotspot: false,
                 oncoKbAvailableDataTypes,

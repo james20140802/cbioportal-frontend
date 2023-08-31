@@ -1,5 +1,6 @@
 import {
     getCivicEntry,
+    getJournalSearch,
     getMyCancerGenomeLinks,
     getRemoteDataGroupStatus,
     getVariantAnnotation,
@@ -7,6 +8,8 @@ import {
     ICivicGeneIndex,
     ICivicVariantIndex,
     IHotspotIndex,
+    IJournalSearch,
+    IJournalSearchData,
     IMyCancerGenomeData,
     IOncoKbData,
     is3dHotspot,
@@ -42,6 +45,7 @@ import { CanonicalMutationType } from 'cbioportal-frontend-commons';
 import { VariantAnnotation, Vues as VUE } from 'genome-nexus-ts-api-client';
 import { RevueCell, sortValue as revueSortValue } from '../revue/Revue';
 import annotationStyles from './annotation.module.scss';
+import JournalSearch from '../journalSearch/JournalSearch';
 
 export type AnnotationProps = {
     mutation?: Mutation;
@@ -50,8 +54,10 @@ export type AnnotationProps = {
     enableHotspot: boolean;
     enableCivic: boolean;
     enableRevue: boolean;
+    enableJournalSearch: boolean;
     hotspotData?: RemoteData<IHotspotIndex | undefined>;
     oncoKbData?: RemoteData<IOncoKbData | Error | undefined>;
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>;
     oncoKbCancerGenes?: RemoteData<CancerGene[] | Error | undefined>;
     usingPublicOncoKbInstance: boolean;
     mergeOncoKbIcons?: boolean;
@@ -76,6 +82,7 @@ export type GenericAnnotationProps = {
     enableMyCancerGenome: boolean;
     enableOncoKb: boolean;
     enableRevue: boolean;
+    enableJournalSearch: boolean;
     mergeOncoKbIcons?: boolean;
     oncoKbContentPadding?: number;
     pubMedCache?: MobxCache;
@@ -97,6 +104,8 @@ export interface IAnnotation {
     civicEntry?: ICivicEntry | null;
     civicStatus: 'pending' | 'error' | 'complete';
     hasCivicVariants: boolean;
+    journalSearchStatus: 'pending' | 'error' | 'complete';
+    journalSearch: IJournalSearch[] | null | undefined;
     hugoGeneSymbol: string;
     vue?: VUE;
 }
@@ -114,6 +123,8 @@ export const DEFAULT_ANNOTATION_DATA: IAnnotation = {
     hasCivicVariants: true,
     myCancerGenomeLinks: [],
     civicStatus: 'complete',
+    journalSearchStatus: 'complete',
+    journalSearch: [],
 };
 
 function getDefaultEntrezGeneId(mutation: Mutation): number {
@@ -137,6 +148,7 @@ export function getAnnotationData(
     indexedVariantAnnotations?: RemoteData<
         { [genomicLocation: string]: VariantAnnotation } | undefined
     >,
+    journalSearchData?: RemoteData<IJournalSearchData | undefined>,
     resolveTumorType: (mutation: Mutation) => string = getDefaultTumorType,
     resolveEntrezGeneId: (mutation: Mutation) => number = getDefaultEntrezGeneId
 ): IAnnotation {
@@ -151,7 +163,9 @@ export function getAnnotationData(
             oncoKbData?.isComplete &&
             civicGenes?.isComplete &&
             civicVariants?.isComplete &&
-            indexedVariantAnnotations?.isComplete;
+            journalSearchData?.isComplete &&
+            indexedVariantAnnotations?.isComplete &&
+            journalSearchData.isComplete;
 
         if (memoize) {
             key = JSON.stringify(mutation) + !!usingPublicOncoKbInstance;
@@ -234,6 +248,15 @@ export function getAnnotationData(
                           indexedVariantAnnotations.result
                       )?.annotation_summary?.vues
                     : undefined,
+            journalSearchStatus: journalSearchData
+                ? journalSearchData.status
+                : 'pending',
+            journalSearch: journalSearchData?.isComplete
+                ? getJournalSearch(
+                      mutation,
+                      journalSearchData.result as IJournalSearchData
+                  )
+                : undefined,
         };
 
         // oncoKbData may exist but it might be an instance of Error, in that case we flag the status as error
@@ -324,6 +347,7 @@ export function GenericAnnotation(props: GenericAnnotationProps): JSX.Element {
         enableMyCancerGenome,
         enableOncoKb,
         enableRevue,
+        enableJournalSearch,
         pubMedCache,
         userDisplayName,
         mergeOncoKbIcons,
@@ -379,6 +403,12 @@ export function GenericAnnotation(props: GenericAnnotationProps): JSX.Element {
                     status={annotation.hotspotStatus}
                 />
             )}
+            {enableJournalSearch && (
+                <JournalSearch
+                    journalSearchStatus={annotation.journalSearchStatus}
+                    journalSearch={annotation.journalSearch}
+                />
+            )}
         </span>
     );
 }
@@ -403,6 +433,7 @@ export default class Annotation extends React.Component<AnnotationProps, {}> {
             civicGenes,
             civicVariants,
             indexedVariantAnnotations,
+            journalSearchData,
         } = props;
 
         return getAnnotationData(
@@ -415,6 +446,7 @@ export default class Annotation extends React.Component<AnnotationProps, {}> {
             civicGenes,
             civicVariants,
             indexedVariantAnnotations,
+            journalSearchData,
             resolveTumorType,
             resolveEntrezGeneId
         );

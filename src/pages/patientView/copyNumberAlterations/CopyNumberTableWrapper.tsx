@@ -264,6 +264,7 @@ export default class CopyNumberTableWrapper extends React.Component<
                             this.oncokbWidth
                         ),
                         enableOncoKb: this.props.enableOncoKb as boolean,
+                        enableJournalSearch: false,
                         pubMedCache: this.pageStore.pubMedCache,
                         civicGenes: this.pageStore.cnaCivicGenes,
                         civicVariants: this.pageStore.cnaCivicVariants,
